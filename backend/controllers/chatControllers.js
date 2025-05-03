@@ -247,12 +247,15 @@ const addToGroup = asyncHandler(async (req, res) => {
 });
 
 const removeFromGroup = asyncHandler(async (req, res) => {
-  const { chatId, userId } = req.body;
+  const { chatId, userId, newGroupAdmin } = req.body;
 
   if (!chatId || !userId) {
     res.status(400);
     throw new Error("ChatId and UserId are required");
   }
+
+  // Find the chat to check the group admin
+  const chat = await Chat.findById(chatId);
 
   if (!chat) {
     res.status(404);
@@ -265,6 +268,7 @@ const removeFromGroup = asyncHandler(async (req, res) => {
     throw new Error("Only the group admin can remove users");
   }
 
+  // If the user to be removed is the group admin
   if (userId.toString() === chat.groupAdmin.toString()) {
     if (!newGroupAdmin) {
       res.status(400);
@@ -287,6 +291,7 @@ const removeFromGroup = asyncHandler(async (req, res) => {
       chatId,
       {
         $pull: { users: userId },
+        groupAdmin: newGroupAdmin, // Update the group admin
       },
       { new: true }
     )
@@ -296,7 +301,8 @@ const removeFromGroup = asyncHandler(async (req, res) => {
     return res.json(updatedChat);
   }
 
-  const removed = await Chat.findByIdAndUpdate(
+  // If the user to be removed is not the group admin, proceed as before
+  const updatedChat = await Chat.findByIdAndUpdate(
     chatId,
     {
       $pull: { users: userId },
@@ -306,12 +312,7 @@ const removeFromGroup = asyncHandler(async (req, res) => {
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
 
-  if (!removed) {
-    res.status(404);
-    throw new Error("Chat not found");
-  } else {
-    res.json(removed);
-  }
+  return res.json(updatedChat);
 });
 
 module.exports = {

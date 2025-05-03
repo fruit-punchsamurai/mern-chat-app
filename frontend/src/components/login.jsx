@@ -41,6 +41,7 @@ const Login = () => {
       email: "guest@example.com",
       password: "123456",
     });
+    toast.success("Login Successful");
     setIsGuestLogin(true);
     // Implement guest login logic here
     console.log("Logging in as guest");

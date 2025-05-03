@@ -1,13 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Login from "@/components/login";
 import SignUp from "@/components/signup";
 import { Toaster } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const Homepage = () => {
   const [activeTab, setActiveTab] = useState("login");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+
+    if (user) {
+      navigate("/chats");
+    }
+  }, [navigate]);
 
   return (
     <div>
