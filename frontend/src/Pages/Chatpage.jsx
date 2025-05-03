@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { ChatState } from "../Context/ChatProvider";
 import { NavBar } from "@/components/NavBar";
-
+import MyChats from "@/components/MyChats";
+import { Toaster } from "sonner";
+import ChatBox from "@/components/ChatBox";
 const dummyUsers = [
   {
     _id: "1",
@@ -80,6 +82,8 @@ const Chatpage = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
 
+  const [fetchAgain, setFetchAgain] = useState(false);
+
   const handleSearch = (query) => {
     if (!query) {
       setSearchResults([]);
@@ -146,14 +150,22 @@ const Chatpage = () => {
 
   if (!user) return <div>Loading...</div>;
   return (
-    <>
+    <div className="flex flex-col h-screen bg-gray-900">
+      <Toaster position="top-right" richColors closeButton />
       <NavBar />
-      {/* //Side by Side
-      <div>
-        <MyChats />
-        <ChatBox />
-      </div> */}
-    </>
+      <div className="flex flex-1 overflow-hidden">
+        <MyChats messages={messages} fetchAgain={fetchAgain} />
+        <ChatBox
+          messages={messages.filter(
+            (m) => selectedChat && m.chat === selectedChat._id
+          )}
+          user={user}
+          sendMessage={sendMessage}
+          fetchAgain={fetchAgain}
+          setFetchAgain={setFetchAgain}
+        />
+      </div>
+    </div>
   );
 };
 
