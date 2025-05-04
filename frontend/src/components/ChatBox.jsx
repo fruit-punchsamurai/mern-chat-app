@@ -32,7 +32,8 @@ let socket, selectedChatCompare;
 const ChatBox = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { user, selectedChat, setSelectedChat } = ChatState();
+  const { user, selectedChat, setSelectedChat, notification, setNotification } =
+    ChatState();
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -132,7 +133,10 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageRecieved.chat._id
       ) {
-        // Optionally trigger toast/notification
+        if (!notification.includes(newMessageRecieved)) {
+          setNotification([newMessageRecieved, ...notification]);
+          setFetchAgain((prev) => !prev);
+        }
       } else {
         setMessages((prevMessages) => [...prevMessages, newMessageRecieved]);
         setFetchAgain((prev) => !prev);
@@ -260,7 +264,7 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
             <Loader2 className="animate-spin h-12 w-12 text-gray-400" />
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 flex flex-col justify-end h-full">
             {messages && messages.length > 0 ? (
               messages.map((message, index) => {
                 const sameSender = isSameSender(

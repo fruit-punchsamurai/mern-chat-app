@@ -106,9 +106,11 @@ const MyChats = ({ fetchAgain }) => {
                       : chat.chatName}
                     {/* {getChatName(chat)} */}
                   </p>
-                  <p className="text-sm text-gray-400 truncate">
-                    {chat.lastMessage.sender.name}: {chat.lastMessage.content}
-                  </p>
+                  {chat.lastMessage && (
+                    <p className="text-sm text-gray-400 truncate">
+                      {chat.lastMessage.sender.name}: {chat.lastMessage.content}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

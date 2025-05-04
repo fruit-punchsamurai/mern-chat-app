@@ -7,6 +7,7 @@ const ChatProvider = ({ children }) => {
   const [user, setUser] = useState();
   const [selectedChat, setSelectedChat] = useState();
   const [chats, setChats] = useState([]);
+  const [notification, setNotification] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -16,9 +17,26 @@ const ChatProvider = ({ children }) => {
       navigate("/");
     }
   }, [navigate]);
+
+  useEffect(() => {
+    if (!selectedChat) return;
+
+    setNotification((prevNotifications) =>
+      prevNotifications.filter((notif) => notif.chat._id !== selectedChat._id)
+    );
+  }, [selectedChat]);
   return (
     <chatContext.Provider
-      value={{ user, setUser, selectedChat, setSelectedChat, chats, setChats }}
+      value={{
+        user,
+        setUser,
+        selectedChat,
+        setSelectedChat,
+        chats,
+        setChats,
+        notification,
+        setNotification,
+      }}
     >
       {children}
     </chatContext.Provider>

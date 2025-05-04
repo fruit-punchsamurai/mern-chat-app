@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Search, X } from "lucide-react";
+import { Bell, Ghost, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,6 +21,7 @@ import SearchLoading from "./search/SearchLoading";
 import SearchUserItem from "./search/SearchUserItem";
 import { Loader2 } from "lucide-react";
 import ProfileModal from "./search/ProfileModal";
+import { getSenderName } from "@/Helper/ChatHelper";
 
 export const NavBar = () => {
   const navigate = useNavigate();
@@ -31,7 +32,14 @@ export const NavBar = () => {
   const [loadingChat, setLoadingChat] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
 
-  const { user, setSelectedChat, chats, setChats } = ChatState();
+  const {
+    user,
+    setSelectedChat,
+    chats,
+    setChats,
+    notification,
+    setNotification,
+  } = ChatState();
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -169,14 +177,14 @@ export const NavBar = () => {
           <div className="flex items-center space-x-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative text-white hover:bg-gray-700"
-                >
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
-                </Button>
+                <button className="relative text-white hover:bg-gray-700">
+                  <Bell />
+                  {notification && notification.length > 0 && (
+                    <span className="absolute -top-3 -right-2 h-fit w-fit px-1.5 py-0.5 rounded-full bg-red-500 text-xs">
+                      {notification.length}
+                    </span>
+                  )}
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
@@ -184,12 +192,31 @@ export const NavBar = () => {
               >
                 <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-gray-600" />
-                <DropdownMenuItem className="hover:bg-gray-600 focus:bg-gray-600">
-                  New message from Jane
-                </DropdownMenuItem>
-                <DropdownMenuItem className="hover:bg-gray-600 focus:bg-gray-600">
-                  Bob added you to Tech Group
-                </DropdownMenuItem>
+                {notification && notification.length > 0 ? (
+                  notification.map((notif) => (
+                    <DropdownMenuItem
+                      key={notif._id}
+                      className="hover:bg-gray-600 focus:bg-gray-600"
+                      onClick={() => {
+                        setSelectedChat(notif.chat);
+                        setNotification(
+                          notification.filter((n) => n !== notif)
+                        );
+                      }}
+                    >
+                      {notif.chat.isGroupChat
+                        ? `New Message in ${notif.chat.chatName}`
+                        : `New Message from ${getSenderName(
+                            user,
+                            notif.chat.users
+                          )}`}
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <DropdownMenuItem className="hover:bg-gray-600 focus:bg-gray-600">
+                    No new notifications
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
