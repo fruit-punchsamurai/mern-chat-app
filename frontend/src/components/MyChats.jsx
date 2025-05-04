@@ -10,8 +10,9 @@ import ChatLoading from "./chats/ChatLoading";
 import { getSenderName, getSenderImage } from "@/Helper/ChatHelper";
 import CreateGroupChatModal from "./chats/CreateGroupChatModal";
 
-const MyChats = ({ messages, fetchAgain }) => {
-  const { user, chats, setChats, selectedChat, setSelectedChat } = ChatState();
+const MyChats = ({ fetchAgain }) => {
+  const { user, chats, setChats, selectedChat, setSelectedChat, messages } =
+    ChatState();
 
   const [showCreateGroup, setShowCreateGroup] = useState(false);
 
@@ -105,9 +106,9 @@ const MyChats = ({ messages, fetchAgain }) => {
                       : chat.chatName}
                     {/* {getChatName(chat)} */}
                   </p>
-                  {/* <p className="text-sm text-gray-400 truncate">
-                    {getLastMessage(chat)}
-                  </p> */}
+                  <p className="text-sm text-gray-400 truncate">
+                    {chat.lastMessage.sender.name}: {chat.lastMessage.content}
+                  </p>
                 </div>
               </div>
             </div>

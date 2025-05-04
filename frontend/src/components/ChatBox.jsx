@@ -24,6 +24,10 @@ import SenderProfileModal from "./chats/SenderProfileModal";
 import UpdateGroupChatModal from "./chats/UpdateGroupChatModal";
 import { toast } from "sonner";
 import axios from "axios";
+import { io } from "socket.io-client";
+
+const ENDPOINT = "http://localhost:5000";
+let socket, selectedChatCompare;
 
 const ChatBox = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
@@ -33,6 +37,9 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
   const messagesEndRef = useRef(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showUpdateGroupChat, setShowUpdateGroupChat] = useState(false);
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   const fetchMessages = async () => {
     if (!selectedChat) {
@@ -51,27 +58,19 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
         `/api/message/${selectedChat._id}`,
         config
       );
-      console.log("messages", data);
       setMessages(data);
       setLoading(false);
+
+      socket.emit("join chat", selectedChat._id);
     } catch (error) {
       toast.error("Failed to Load the Messages"), setLoading(false);
     }
   };
 
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    fetchMessages();
-  }, [selectedChat]);
-
   const handleSend = async () => {
     if (newMessage.trim()) {
+      socket.emit("stop typing", selectedChat._id);
+      setTyping(false);
       try {
         const config = {
           headers: {
@@ -91,9 +90,9 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
           config
         );
 
-        console.log(data, "message");
-
+        socket.emit("new message", data);
         setMessages([...messages, data]);
+        setFetchAgain((prev) => !prev);
       } catch (error) {
         toast.error("Failed to send the Message");
         setNewMessage("");
@@ -101,17 +100,84 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+    socket.on("connected", () => setSocketConnected(true));
+    socket.on("typing", (room) => {
+      if (room === selectedChatCompare._id) {
+        setIsTyping(true);
+      }
+    });
+
+    socket.on("stop typing", (room) => {
+      if (room === selectedChatCompare._id) {
+        setIsTyping(false);
+      }
+    });
+  }, [selectedChat]);
+
+  useEffect(() => {
+    if (!selectedChat) return;
+    fetchMessages();
+    selectedChatCompare = selectedChat;
+    setTyping(false);
+    setIsTyping(false);
+    socket.emit("stop typing", selectedChat._id);
+  }, [selectedChat]);
+
+  useEffect(() => {
+    socket.on("message recieved", (newMessageRecieved) => {
+      if (
+        !selectedChatCompare ||
+        selectedChatCompare._id !== newMessageRecieved.chat._id
+      ) {
+        // Optionally trigger toast/notification
+      } else {
+        setMessages((prevMessages) => [...prevMessages, newMessageRecieved]);
+        setFetchAgain((prev) => !prev);
+      }
+    });
+
+    return () => socket.off("message recieved");
+  }, []);
+
+  const handleType = (e) => {
+    setNewMessage(e.target.value);
+
+    if (!socketConnected) {
+      return;
+    }
+
+    if (!typing) {
+      setTyping(true);
+      socket.emit("typing", selectedChat._id);
+    }
+
+    let lastTypingTime = new Date().getTime();
+    let timerLength = 3000;
+    setTimeout(() => {
+      let timeNow = new Date().getTime();
+      let timeDiff = timeNow - lastTypingTime;
+      if (timeDiff >= timerLength && typing) {
+        socket.emit("stop typing", selectedChat._id);
+        setTyping(false);
+      }
+    }, timerLength);
+  };
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
-  };
-
-  // Format timestamp
-  const formatTime = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   if (!selectedChat) {
@@ -130,12 +196,6 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
       </div>
     );
   }
-
-  const handleType = (e) => {
-    setNewMessage(e.target.value);
-    //Typing Indicator Logic
-  };
-
   return (
     <div className="flex-1 flex flex-col h-full bg-gray-900">
       {/* Chat header */}
@@ -194,7 +254,6 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
       </div>
 
       {/* Messages area */}
-      {/* Messages area */}
       <div className="flex-1 overflow-y-auto p-4">
         {loading ? (
           <div className="flex justify-center items-center h-full">
@@ -250,6 +309,27 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
               <div className="text-center text-gray-500 my-8">
                 No messages yet. Start the conversation!
               </div>
+            )}
+
+            {isTyping ? (
+              <div className="flex justify-start pl-10 mt-2">
+                <div className="bg-gray-600 text-white text-sm py-4 px-4 rounded-3xl flex items-center space-x-1">
+                  <span
+                    className="w-2 h-2 bg-white rounded-full animate-bounce"
+                    style={{ animationDelay: "0s" }}
+                  ></span>
+                  <span
+                    className="w-2 h-2 bg-white rounded-full animate-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                  ></span>
+                  <span
+                    className="w-2 h-2 bg-white rounded-full animate-bounce"
+                    style={{ animationDelay: "0.4s" }}
+                  ></span>
+                </div>
+              </div>
+            ) : (
+              <div className="h-[40px] mt-2" /> // same height as the typing indicator
             )}
             <div ref={messagesEndRef} />
           </div>

@@ -75,78 +75,9 @@ const dummyMessages = [
 ];
 
 const Chatpage = () => {
-  const { user, setUser } = ChatState();
-  const [selectedChat, setSelectedChat] = useState(null);
-  const [chats, setChats] = useState(dummyChats);
-  const [messages, setMessages] = useState(dummyMessages);
-  const [searchResults, setSearchResults] = useState([]);
-  const [showSearchResults, setShowSearchResults] = useState(false);
+  const { user } = ChatState();
 
   const [fetchAgain, setFetchAgain] = useState(false);
-
-  const handleSearch = (query) => {
-    if (!query) {
-      setSearchResults([]);
-      setShowSearchResults(false);
-      return;
-    }
-
-    const results = dummyUsers.filter(
-      (user) =>
-        user.name.toLowerCase().includes(query.toLowerCase()) ||
-        user.email.toLowerCase().includes(query.toLowerCase())
-    );
-
-    setSearchResults(results);
-    setShowSearchResults(true);
-  };
-
-  const accessChat = (userId) => {
-    // // Find existing chat or create new one
-    // const existingChat = chats.find(
-    //   (c) =>
-    //     !c.isGroupChat && c.users.includes(userId) && c.users.includes(user._id)
-    // );
-
-    // if (existingChat) {
-    //   setSelectedChat(existingChat);
-    // } else {
-    //   // In a real app, you would create a new chat here
-    //   const newChat = {
-    //     _id: `c${chats.length + 1}`,
-    //     chatName: dummyUsers.find((u) => u._id === userId).name,
-    //     isGroupChat: false,
-    //     users: [user._id, userId],
-    //     lastMessage: null,
-    //   };
-
-    //   setChats([...chats, newChat]);
-    //   setSelectedChat(newChat);
-    // }
-
-    setShowSearchResults(false);
-  };
-
-  const sendMessage = (content) => {
-    if (!content.trim() || !selectedChat) return;
-
-    const newMessage = {
-      _id: `m${messages.length + 1}`,
-      sender: user._id,
-      content,
-      chat: selectedChat._id,
-      createdAt: new Date().toISOString(),
-    };
-
-    setMessages([...messages, newMessage]);
-
-    // Update last message in chat
-    const updatedChats = chats.map((c) =>
-      c._id === selectedChat._id ? { ...c, lastMessage: newMessage._id } : c
-    );
-
-    setChats(updatedChats);
-  };
 
   if (!user) return <div>Loading...</div>;
   return (
@@ -154,7 +85,7 @@ const Chatpage = () => {
       <Toaster position="top-right" richColors closeButton />
       <NavBar />
       <div className="flex flex-1 overflow-hidden">
-        <MyChats messages={messages} fetchAgain={fetchAgain} />
+        <MyChats fetchAgain={fetchAgain} />
         <ChatBox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
       </div>
     </div>
