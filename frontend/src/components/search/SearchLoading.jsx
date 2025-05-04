@@ -3,7 +3,7 @@ import { Skeleton } from "../ui/skeleton";
 const SearchLoading = () => {
   return (
     <div className="mt-1 w-full bg-gray-700 rounded-md shadow-lg max-h-96 overflow-auto p-4 space-y-4">
-      {[...Array(5)].map((_, index) => (
+      {[...Array(2)].map((_, index) => (
         <div
           className="flex items-center space-x-4"
           key={`chat-load-skeleton-${index}`}

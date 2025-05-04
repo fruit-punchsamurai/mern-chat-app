@@ -155,15 +155,7 @@ const Chatpage = () => {
       <NavBar />
       <div className="flex flex-1 overflow-hidden">
         <MyChats messages={messages} fetchAgain={fetchAgain} />
-        <ChatBox
-          messages={messages.filter(
-            (m) => selectedChat && m.chat === selectedChat._id
-          )}
-          user={user}
-          sendMessage={sendMessage}
-          fetchAgain={fetchAgain}
-          setFetchAgain={setFetchAgain}
-        />
+        <ChatBox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
       </div>
     </div>
   );

@@ -23,6 +23,7 @@ const UpdateGroupChatModal = ({
   setShowUpdateGroupChat,
   fetchAgain,
   setFetchAgain,
+  fetchMessages,
 }) => {
   const { user, selectedChat, setSelectedChat } = ChatState();
   const [groupChatName, setGroupChatName] = useState();
@@ -157,6 +158,7 @@ const UpdateGroupChatModal = ({
       }
 
       setFetchAgain(!fetchAgain);
+      fetchMessages();
       setAddRemoveLoading(false);
     } catch (error) {
       toast.error("Error Occured!");

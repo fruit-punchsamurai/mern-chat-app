@@ -1,21 +1,63 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Info, ArrowLeft, Settings, UserRound } from "lucide-react";
+import {
+  Send,
+  Info,
+  ArrowLeft,
+  Settings,
+  UserRound,
+  Loader2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChatState } from "@/Context/ChatProvider";
-import { getSenderName, getSender, getSenderImage } from "@/Helper/ChatHelper";
+import {
+  getSenderName,
+  getSender,
+  getSenderImage,
+  isSameSender,
+  isLastMessage,
+} from "@/Helper/ChatHelper";
 import SenderProfileModal from "./chats/SenderProfileModal";
 import UpdateGroupChatModal from "./chats/UpdateGroupChatModal";
+import { toast } from "sonner";
+import axios from "axios";
 
-const ChatBox = ({ messages, sendMessage, fetchAgain, setFetchAgain }) => {
+const ChatBox = ({ fetchAgain, setFetchAgain }) => {
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
   const { user, selectedChat, setSelectedChat } = ChatState();
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showUpdateGroupChat, setShowUpdateGroupChat] = useState(false);
+
+  const fetchMessages = async () => {
+    if (!selectedChat) {
+      return;
+    }
+
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      setLoading(true);
+      const { data } = await axios.get(
+        `/api/message/${selectedChat._id}`,
+        config
+      );
+      console.log("messages", data);
+      setMessages(data);
+      setLoading(false);
+    } catch (error) {
+      toast.error("Failed to Load the Messages"), setLoading(false);
+    }
+  };
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -24,10 +66,38 @@ const ChatBox = ({ messages, sendMessage, fetchAgain, setFetchAgain }) => {
     }
   }, [messages]);
 
-  const handleSend = () => {
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedChat]);
+
+  const handleSend = async () => {
     if (newMessage.trim()) {
-      sendMessage(newMessage);
-      setNewMessage("");
+      try {
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        };
+
+        setNewMessage("");
+
+        const { data } = await axios.post(
+          "/api/message",
+          {
+            content: newMessage,
+            chatId: selectedChat._id,
+          },
+          config
+        );
+
+        console.log(data, "message");
+
+        setMessages([...messages, data]);
+      } catch (error) {
+        toast.error("Failed to send the Message");
+        setNewMessage("");
+      }
     }
   };
 
@@ -60,6 +130,11 @@ const ChatBox = ({ messages, sendMessage, fetchAgain, setFetchAgain }) => {
       </div>
     );
   }
+
+  const handleType = (e) => {
+    setNewMessage(e.target.value);
+    //Typing Indicator Logic
+  };
 
   return (
     <div className="flex-1 flex flex-col h-full bg-gray-900">
@@ -119,53 +194,66 @@ const ChatBox = ({ messages, sendMessage, fetchAgain, setFetchAgain }) => {
       </div>
 
       {/* Messages area */}
+      {/* Messages area */}
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="space-y-4">
-          {messages.length > 0 ? (
-            messages.map((message) => {
-              const isOwnMessage = message.sender === user._id;
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <Loader2 className="animate-spin h-12 w-12 text-gray-400" />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {messages && messages.length > 0 ? (
+              messages.map((message, index) => {
+                const sameSender = isSameSender(
+                  messages,
+                  message,
+                  index,
+                  user._id
+                );
+                const finalMessage = isLastMessage(messages, index, user._id);
+                const isOwnMessage = message.sender._id === user._id;
 
-              return (
-                <div
-                  key={message._id}
-                  className={`flex ${
-                    isOwnMessage ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div className="flex items-end gap-2 max-w-[70%]">
-                    {!isOwnMessage && (
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                        <AvatarFallback>U</AvatarFallback>
-                      </Avatar>
-                    )}
-                    <div
-                      className={`rounded-lg p-3 ${
-                        isOwnMessage
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-700 text-white border-gray-600"
-                      }`}
-                    >
-                      <p>{message.content}</p>
-                      <p
-                        className={`text-xs mt-1 text-right ${
-                          isOwnMessage ? "text-purple-200" : "text-gray-400"
+                return (
+                  <div
+                    key={message._id}
+                    className={`flex ${
+                      isOwnMessage ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div className="flex items-end gap-2 max-w-[70%]">
+                      {/* Show avatar if sameSender or finalMessage and it's not own message */}
+                      {sameSender || finalMessage ? (
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={message.sender.pic} />
+                          <AvatarFallback>
+                            {message.sender.name.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                      ) : (
+                        <div className="h-8 w-8" /> // Placeholder to maintain alignment
+                      )}
+
+                      <div
+                        className={`rounded-4xl px-3 py-2 ${
+                          isOwnMessage
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-700 text-white border-gray-600"
                         }`}
                       >
-                        {formatTime(message.createdAt)}
-                      </p>
+                        <p>{message.content}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="text-center text-gray-500 my-8">
-              No messages yet. Start the conversation!
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+                );
+              })
+            ) : (
+              <div className="text-center text-gray-500 my-8">
+                No messages yet. Start the conversation!
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
       </div>
 
       {/* Message input */}
@@ -173,7 +261,7 @@ const ChatBox = ({ messages, sendMessage, fetchAgain, setFetchAgain }) => {
         <div className="flex items-center gap-2">
           <Input
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={handleType}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             className="flex-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
@@ -200,6 +288,7 @@ const ChatBox = ({ messages, sendMessage, fetchAgain, setFetchAgain }) => {
         setShowUpdateGroupChat={setShowUpdateGroupChat}
         fetchAgain={fetchAgain}
         setFetchAgain={setFetchAgain}
+        fetchMessages={fetchMessages}
       />
     </div>
   );
