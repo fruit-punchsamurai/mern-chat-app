@@ -7,6 +7,7 @@ const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes.js");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const User = require("./models/userModel");
+const path = require("path");
 
 dotenv.config();
 connectDB();
@@ -18,6 +19,24 @@ app.use(express.json()); //to accept JSON data
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
+
+//------------------------------------------------PRODUCTION-----------------------------------------------------------------------
+if (process.env.NODE_ENV === "production") {
+  // Use the frontend build folder
+  const __dirname = path.resolve();
+  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+  // All routes not matching API will be redirected to index.html
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running");
+  });
+}
+//------------------------------------------------PRODUCTION-----------------------------------------------------------------------
+
 app.use(notFound);
 app.use(errorHandler);
 
@@ -27,10 +46,11 @@ const server = app.listen(PORT, console.log(`Server started at Port: ${PORT}`));
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin:
+      process.env.NODE_ENV === "production" ? "*" : "http://localhost:5173",
+    methods: ["GET", "POST"],
   },
 });
-
 const onlineUsers = new Map();
 
 io.on("connection", (socket) => {

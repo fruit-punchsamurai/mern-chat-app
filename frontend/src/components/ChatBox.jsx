@@ -25,8 +25,8 @@ import UpdateGroupChatModal from "./chats/UpdateGroupChatModal";
 import { toast } from "sonner";
 import axios from "axios";
 import { io } from "socket.io-client";
+import { SOCKET_ENDPOINT } from "../config/index";
 
-const ENDPOINT = "http://localhost:5000";
 let socket, selectedChatCompare;
 
 const ChatBox = ({ fetchAgain, setFetchAgain }) => {
@@ -132,7 +132,7 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
   };
 
   useEffect(() => {
-    socket = io(ENDPOINT);
+    socket = io(SOCKET_ENDPOINT);
     socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", (room) => {
