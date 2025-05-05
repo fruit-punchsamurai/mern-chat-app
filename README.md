@@ -4,7 +4,7 @@ A real-time chat application built using the **MERN** stack: **MongoDB**, **Expr
 
 ### 🔗 Live Demo
 
-[Click here to view the live app on Render](https://mern-chat-app-bg6g.onrender.com)
+[Click here to view the live app](https://mern-chat-app-bg6g.onrender.com)
 
 ## 🔑 Authentication
 
