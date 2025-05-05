@@ -210,7 +210,7 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
   // Scroll to bottom when messages change
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current.scrollIntoView();
     }
   }, [messages]);
 

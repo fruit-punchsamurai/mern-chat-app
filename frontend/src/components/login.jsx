@@ -39,7 +39,7 @@ const Login = () => {
   const handleGuestLogin = () => {
     setLoginFormData({
       email: "guest@example.com",
-      password: "123456",
+      password: "password",
     });
     toast.success("Login Successful");
     setIsGuestLogin(true);
