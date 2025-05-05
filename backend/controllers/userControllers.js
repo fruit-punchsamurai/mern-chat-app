@@ -147,7 +147,6 @@ const addNotification = asyncHandler(async (req, res) => {
 
 const removeNotification = asyncHandler(async (req, res) => {
   const { notificationId } = req.body;
-  console.log("here in remove notification");
   if (!notificationId) {
     res.status(400);
     throw new Error("Notification ID is required");
