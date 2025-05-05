@@ -11,7 +11,14 @@ const userSchema = mongoose.Schema(
       default:
         "https://icon-library.com/images/default-profile-icon/default-profile-icon-6.jpg",
     },
+    notifications: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
   },
+
   { timestamps: true }
 );
 

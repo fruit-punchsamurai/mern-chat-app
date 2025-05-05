@@ -32,8 +32,14 @@ let socket, selectedChatCompare;
 const ChatBox = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { user, selectedChat, setSelectedChat, notification, setNotification } =
-    ChatState();
+  const {
+    user,
+    selectedChat,
+    setSelectedChat,
+    notification,
+    setNotification,
+    logOutUser,
+  } = ChatState();
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -65,6 +71,30 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
       socket.emit("join chat", selectedChat._id);
     } catch (error) {
       toast.error("Failed to Load the Messages"), setLoading(false);
+    }
+  };
+
+  const addNotification = async (messageId) => {
+    if (!user || !messageId) return;
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.post(
+        "/api/user/notification/add",
+        { messageId },
+        config
+      );
+
+      setNotification(data.notifications);
+      return data;
+    } catch (error) {
+      console.error("Failed to add notification:", error);
+      toast.error("Failed to add notification");
     }
   };
 
@@ -119,6 +149,12 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
   }, [selectedChat]);
 
   useEffect(() => {
+    if (logOutUser) {
+      socket.disconnect();
+    }
+  }, [logOutUser]);
+
+  useEffect(() => {
     if (!selectedChat) return;
     fetchMessages();
     selectedChatCompare = selectedChat;
@@ -128,14 +164,15 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
   }, [selectedChat]);
 
   useEffect(() => {
-    socket.on("message recieved", (newMessageRecieved) => {
+    socket.on("message recieved", async (newMessageRecieved) => {
       if (
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageRecieved.chat._id
       ) {
         if (!notification.includes(newMessageRecieved)) {
-          setNotification([newMessageRecieved, ...notification]);
+          // setNotification([newMessageRecieved, ...notification]);
           setFetchAgain((prev) => !prev);
+          await addNotification(newMessageRecieved._id);
         }
       } else {
         setMessages((prevMessages) => [...prevMessages, newMessageRecieved]);
@@ -299,7 +336,7 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
                       <div
                         className={`rounded-4xl px-3 py-2 ${
                           isOwnMessage
-                            ? "bg-purple-600 text-white"
+                            ? "bg-teal-600 text-white"
                             : "bg-gray-700 text-white border-gray-600"
                         }`}
                       >
@@ -353,7 +390,7 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
           <Button
             onClick={handleSend}
             disabled={!newMessage.trim()}
-            className="bg-purple-600 hover:bg-purple-700"
+            className="bg-teal-600 hover:bg-teal-700"
           >
             <Send className="h-4 w-4" />
           </Button>

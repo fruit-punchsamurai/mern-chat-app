@@ -238,7 +238,7 @@ const UpdateGroupChatModal = ({
             onChange={(e) => setGroupChatName(e.target.value)}
           />
           <Button
-            className="bg-purple-600 hover:bg-purple-700 p-2"
+            className="bg-teal-600 hover:bg-teal-700 p-2"
             onClick={handleRename}
           >
             {renameLoading ? (
@@ -277,7 +277,7 @@ const UpdateGroupChatModal = ({
 
         <div className="flex justify-end pt-2">
           <Button
-            className="bg-red-600 hover:bg-purple-700 p-2"
+            className="bg-rose-600 hover:bg-rose-700 p-2"
             onClick={() => handleRemoveUser(user)}
           >
             Leave Group

@@ -69,7 +69,7 @@ const MyChats = ({ fetchAgain }) => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold text-white">My Chats</h2>
         <Button
-          className="bg-purple-600 hover:bg-purple-700"
+          className="bg-teal-600 hover:bg-teal-700"
           onClick={() => setShowCreateGroup(true)}
         >
           <Plus className="h-4 w-4 mr-2" /> New Group

@@ -125,12 +125,12 @@ const SignUp = () => {
   };
 
   return (
-    <Card>
+    <Card className="bg-gray-800 border-gray-700 text-white">
       <CardHeader>
-        <CardTitle className="text-2xl font-medium">
+        <CardTitle className="text-2xl font-medium text-white">
           Create an Account
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-gray-400">
           Fill in your details to create a new account
         </CardDescription>
       </CardHeader>
@@ -143,12 +143,15 @@ const SignUp = () => {
       >
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name" className="text-gray-300">
+              Full Name
+            </Label>
             <Input
               id="name"
               name="name"
               placeholder="John Doe"
               required
+              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
               onChange={(e) => {
                 setSignUpFormData({
                   ...signUpFormData,
@@ -158,13 +161,16 @@ const SignUp = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="signup-email">Email Address</Label>
+            <Label htmlFor="signup-email" className="text-gray-300">
+              Email Address
+            </Label>
             <Input
               id="signup-email"
               name="email"
               type="email"
               placeholder="your.email@example.com"
               required
+              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
               onChange={(e) => {
                 setSignUpFormData({
                   ...signUpFormData,
@@ -174,13 +180,16 @@ const SignUp = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="signup-password">Password</Label>
+            <Label htmlFor="signup-password" className="text-gray-300">
+              Password
+            </Label>
             <div className="relative">
               <Input
                 id="signup-password"
                 name="password"
                 type={showSignupPassword ? "text" : "password"}
                 required
+                className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                 onChange={(e) => {
                   setSignUpFormData({
                     ...signUpFormData,
@@ -190,7 +199,7 @@ const SignUp = () => {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
                 onClick={() => setShowSignupPassword(!showSignupPassword)}
                 aria-label={
                   showSignupPassword ? "Hide password" : "Show password"
@@ -201,13 +210,16 @@ const SignUp = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirm Password</Label>
+            <Label htmlFor="confirm-password" className="text-gray-300">
+              Confirm Password
+            </Label>
             <div className="relative">
               <Input
                 id="confirm-password"
                 name="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 required
+                className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                 onChange={(e) => {
                   setSignUpFormData({
                     ...signUpFormData,
@@ -217,7 +229,7 @@ const SignUp = () => {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 aria-label={
                   showConfirmPassword ? "Hide password" : "Show password"
@@ -228,22 +240,22 @@ const SignUp = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Profile Picture</Label>
+            <Label className="text-gray-300">Profile Picture</Label>
             <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
+              <Avatar className="h-16 w-16 bg-gray-700">
                 <AvatarImage
                   src={profileImage || ""}
                   alt="Profile"
                   className="object-cover"
                 />
-                <AvatarFallback>
+                <AvatarFallback className="bg-gray-700 text-gray-300">
                   <User className="h-8 w-8" />
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <Label
                   htmlFor="picture-upload"
-                  className="flex items-center gap-2 cursor-pointer p-2 border rounded-md hover:bg-gray-50"
+                  className="flex items-center gap-2 cursor-pointer p-2 border border-gray-600 rounded-md hover:bg-gray-700 text-gray-300"
                 >
                   <Upload className="h-4 w-4" />
                   <span>Upload Picture</span>
@@ -261,7 +273,11 @@ const SignUp = () => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button
+            type="submit"
+            className="w-full bg-teal-600 hover:bg-teal-700"
+            disabled={loading}
+          >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {loading ? "" : "Sign Up"}
           </Button>

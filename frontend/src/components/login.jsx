@@ -86,10 +86,10 @@ const Login = () => {
   };
 
   return (
-    <Card>
+    <Card className="bg-gray-800 border-gray-700 text-white">
       <CardHeader>
-        <CardTitle className="text-2xl font-medium">Login</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-2xl font-medium text-white">Login</CardTitle>
+        <CardDescription className="text-gray-400">
           Enter your credentials to access your account
         </CardDescription>
       </CardHeader>
@@ -101,13 +101,16 @@ const Login = () => {
       >
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-gray-300">
+              Email
+            </Label>
             <Input
               id="email"
               name="email"
               type="email"
               placeholder="your.email@example.com"
               required
+              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
               onChange={(e) => {
                 setLoginFormData({
                   ...loginFormData,
@@ -117,13 +120,16 @@ const Login = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-gray-300">
+              Password
+            </Label>
             <div className="relative">
               <Input
                 id="password"
                 name="password"
                 type={showLoginPassword ? "text" : "password"}
                 required
+                className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                 onChange={(e) => {
                   setLoginFormData({
                     ...loginFormData,
@@ -133,7 +139,7 @@ const Login = () => {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
                 onClick={() => setShowLoginPassword(!showLoginPassword)}
                 aria-label={
                   showLoginPassword ? "Hide password" : "Show password"
@@ -145,14 +151,18 @@ const Login = () => {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button
+            type="submit"
+            className="w-full bg-teal-600 hover:bg-teal-700"
+            disabled={loading}
+          >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {loading ? "" : "Login"}
           </Button>
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full bg-teal-600 hover:bg-teal-700"
             onClick={handleGuestLogin}
             disabled={loading}
           >

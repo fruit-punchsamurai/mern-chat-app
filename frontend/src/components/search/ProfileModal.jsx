@@ -44,11 +44,8 @@ const ProfileModal = ({
         </div>
 
         <div className="flex justify-end mt-4">
-          <Button className="bg-purple-600 hover:bg-purple-700 mr-2">
-            Edit Profile
-          </Button>
           <Button
-            className="bg-purple-600 hover:bg-purple-700"
+            className="bg-teal-600 hover:bg-teal-700"
             onClick={logOutHandler}
           >
             Logout

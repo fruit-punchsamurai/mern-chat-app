@@ -2,7 +2,7 @@ import React from "react";
 import { X } from "lucide-react";
 const UserBadge = ({ user, onRemove }) => {
   return (
-    <div className="flex items-center gap-2 bg-purple-700 text-white px-3 py-1 rounded-full">
+    <div className="flex items-center gap-2 bg-teal-700 text-white px-3 py-1 rounded-full">
       <span>{user.name}</span>
       <button
         onClick={() => onRemove(user)}

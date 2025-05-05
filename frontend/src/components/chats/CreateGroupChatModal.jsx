@@ -191,7 +191,7 @@ const CreateGroupChatModal = ({ showCreateGroup, setShowCreateGroup }) => {
           </div>
 
           <div className="flex justify-end pt-2">
-            <Button className="bg-purple-600 hover:bg-purple-700" type="submit">
+            <Button className="bg-teal-600 hover:bg-teal-700" type="submit">
               Create Group
             </Button>
           </div>

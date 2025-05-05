@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Ghost, Search, X } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,7 +25,7 @@ import { getSenderName } from "@/Helper/ChatHelper";
 
 export const NavBar = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,7 +38,7 @@ export const NavBar = () => {
     chats,
     setChats,
     notification,
-    setNotification,
+    setLogOutUser,
   } = ChatState();
 
   const handleKeyDown = (e) => {
@@ -48,12 +48,41 @@ export const NavBar = () => {
   };
 
   const logOutHandler = () => {
+    setLogOutUser(true);
     localStorage.removeItem("userInfo");
     navigate("/");
   };
 
-  const handleSearch = async () => {
-    if (!searchQuery) {
+  // const handleSearch = async () => {
+  //   if (!searchQuery) {
+  //     setSearchResults([]);
+  //     setShowSearchResults(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     const config = {
+  //       headers: {
+  //         Authorization: `Bearer ${user.token}`,
+  //       },
+  //     };
+
+  //     const { data } = await axios.get(
+  //       `/api/user?search=${searchQuery}`,
+  //       config
+  //     );
+
+  //     setLoading(false);
+  //     setSearchResults(data);
+  //     setShowSearchResults(true);
+  //   } catch (error) {
+  //     toast.error("Failed to Load the Search Results");
+  //   }
+  // };
+
+  const handleSearch = async (query) => {
+    if (!query) {
       setSearchResults([]);
       setShowSearchResults(false);
       return;
@@ -67,10 +96,7 @@ export const NavBar = () => {
         },
       };
 
-      const { data } = await axios.get(
-        `/api/user?search=${searchQuery}`,
-        config
-      );
+      const { data } = await axios.get(`/api/user?search=${query}`, config);
 
       setLoading(false);
       setSearchResults(data);
@@ -109,7 +135,7 @@ export const NavBar = () => {
     <div className="bg-gray-800 text-white shadow-md p-4">
       <div className="container flex flex-col gap-4 min-w-full md:flex-row items-center justify-between">
         {/* App name - visible only on desktop */}
-        <div className="hidden md:block text-xl font-bold text-purple-400 md:mr-4">
+        <div className="hidden md:block text-xl font-bold text-teal-400 md:mr-4">
           MERN Chat App
         </div>
 
@@ -120,15 +146,12 @@ export const NavBar = () => {
               <Input
                 type="text"
                 placeholder="Search users..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
+                onChange={(e) => {
+                  handleSearch(e.target.value); // Trigger search when typing
+                }}
                 className="w-full bg-gray-700 border-gray-600 text-white placeholder-gray-400"
               />
-              <Button
-                onClick={handleSearch}
-                className="ml-2 bg-purple-600 hover:bg-purple-700"
-              >
+              <Button className="ml-2 bg-teal-600 hover:bg-tesl-700">
                 {loadingChat ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -199,9 +222,9 @@ export const NavBar = () => {
                       className="hover:bg-gray-600 focus:bg-gray-600"
                       onClick={() => {
                         setSelectedChat(notif.chat);
-                        setNotification(
-                          notification.filter((n) => n !== notif)
-                        );
+                        // setNotification(
+                        //   notification.filter((n) => n !== notif)
+                        // );
                       }}
                     >
                       {notif.chat.isGroupChat

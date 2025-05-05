@@ -23,7 +23,7 @@ const Homepage = () => {
     <div>
       <Toaster position="top-right" richColors closeButton />
 
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <Tabs
             defaultValue="login"
@@ -31,9 +31,19 @@ const Homepage = () => {
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-800">
+              <TabsTrigger
+                value="login"
+                className="data-[state=active]:bg-gray-700 text-white"
+              >
+                Login
+              </TabsTrigger>
+              <TabsTrigger
+                value="signup"
+                className="data-[state=active]:bg-gray-700 text-white"
+              >
+                Sign Up
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
