@@ -2,6 +2,10 @@
 
 A real-time chat application built using the **MERN** stack: **MongoDB**, **Express**, **React**, and **Node.js**. The app supports **one-on-one chats**, **group chats**, and includes **real-time messaging** via **Socket.IO**. If a user is offline or not actively in the chat, they receive **notifications** for new messages.
 
+### 🔗 Live Demo
+
+[Click here to view the live app](https://mern-chat-app-bg6g.onrender.com)
+
 ## 🔑 Authentication
 
 - JWT-based authentication system
