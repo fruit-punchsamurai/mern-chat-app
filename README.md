@@ -32,3 +32,12 @@ A real-time chat application built using the **MERN** stack: **MongoDB**, **Expr
 - MongoDB (with Mongoose)
 - Socket.IO
 - JSON Web Tokens (JWT)
+
+### Screenshot
+![Menu](images/sc1.png)
+
+### Game Screenshot 1
+![Game 1](images/sc2.png)
+
+### Game Screenshot 2
+![Game 2](images/sc3.png)
